@@ -42,6 +42,8 @@ Realtime Chat is becoming very popular with consumer as well as professional wor
 
 To setup the Spark Bot visit [Spark Bot Setup](./spark_setup.md)
 
+**NOTE: To leverage the Spark Bot Service, your Mantl Cluster MUST be configured for deployed applications to be accessible from the public Internet.  This is because it relies on the Spark Cloud to be able to send a WebHook to the myhero_spark application you run in Mantl***
+
 ## Cisco Tropo Service
 Mobile phones are everywhere, and SMS/TXT continues to be a method for interacting with services.  Cisco Tropo is a SaaS solution that provides Voice and SMS services that can be integrated to any applciation through a very easy to use API.  MyHero has an optional Tropo service that allows users to send SMS messages to the MyHero applciation to learn abou the voting service, find out current results, and cast votes.
 
@@ -49,13 +51,15 @@ Mobile phones are everywhere, and SMS/TXT continues to be a method for interacti
 
 To setup the Tropo Service visit [Tropo Service Setup](./tropo_setup.md)
 
+**NOTE: To leverage the Tropo Service, your Mantl Cluster MUST be configured for deployed applications to be accessible from the public Internet.  This is because it relies on the Tropo Cloud to be able to send a REST call to the myhero_tropo application you run in Mantl***
+
 # Prerequisites
 
 In order to leverage this demonstration, you will need to have a Mantl cluster up and functional already.  For help with this visit the Docs site available at [http://mantl.io](http://mantl.io).  You will need to have the address for the control nodes and a username and password for an active account.
 
 # Setup
 
-Run `source myhero_setup` to enter and record the address, application domain, username, and password for your Mantl instance as non-persistent Environment Variables.  This means you will need to run this command everytime you open an new terminal session.
+Run `source myhero_setup` to enter and record the deployment name, address, application domain, username, and password for your Mantl instance as non-persistent Environment Variables.  This means you will need to run this command everytime you open an new terminal session.
 
 # Basic Deployment
 ## Install
@@ -64,7 +68,7 @@ Run `./myhero-install.sh` to deploy all three services (data, app, web) to your 
 
 After running the install it will take a 2-5 minutes for all three services to fully deploy and become "healthy".  You can monitor this in the Marathon Web GUI.
 
-You should be able to reach the web interface for the application at `http://myhero-web.YOUR-DOMAIN` where `YOUR-DOMAIN` refers to the wildcard domain configured for Traefik.
+You should be able to reach the web interface for the application at `http://DEPLOYMENTNAME-web.YOUR-DOMAIN` where `DEPLOYMENTNAME` refers to the deployment name provided at setup and `YOUR-DOMAIN` refers to the wildcard domain configured for Traefik.
 
 ## Uninstallation
 
@@ -82,7 +86,7 @@ Run `./myhero-install-queue.sh` to deploy the standard three services (data, app
 
 After running the install it will take a 2-5 minutes for all three services to fully deploy and become "healthy".  You can monitor this in the Marathon Web GUI.
 
-You should be able to reach the web interface for the application at `http://myhero-web.YOUR-DOMAIN` where `YOUR-DOMAIN` refers to the wildcard domain configured for Traefik.
+You should be able to reach the web interface for the application at `http://DEPLOYMENTNAME-web.YOUR-DOMAIN` where `DEPLOYMENTNAME` refers to the deployment name provided at setup and `YOUR-DOMAIN` refers to the wildcard domain configured for Traefik.
 
 ## Uninstallation
 
@@ -98,7 +102,7 @@ Run `./myhero-scaleweb.sh` to have options to change the number of web and app i
 # Advanced Demos
 
 ## Installation
-If you would rather demo deploying each service independently you can use these sample curl commands.  These commands assume that you've run `source myhero_setup` to store environment variables for key details.
+If you would rather demo deploying each service independently you can use these sample curl commands.  These commands assume that you've run `source myhero_setup` to store environment variables for key details.  This also uses the default of "myhero" as the deployment name.
 
 * Deploy the data service
   * `curl -k -X POST -u $MANTL_USER:$MANTL_PASSWORD https://$MANTL_CONTROL:8080/v2/apps -H "Content-type: application/json" -d @myhero-data.json| python -m json.tool`
@@ -115,18 +119,18 @@ If you would rather demo deploying each service independently you can use these 
 
 ## Getting Details on a Service
 * To get the details on one of the services
-  * `curl -k -X GET -u $MANTL_USER:$MANTL_PASSWORD https://$MANTL_CONTROL:8080/v2/apps/myhero/web -H "Content-type: application/json" | python -m json.tool`
+  * `curl -k -X GET -u $MANTL_USER:$MANTL_PASSWORD https://$MANTL_CONTROL:8080/v2/apps/DEPLOYMENTNAME/web -H "Content-type: application/json" | python -m json.tool`
 
 ## Interfacing with the App Tier API
 
 A strength of Modern Applications are that you can interact with any of the services directly through APIs if the native interface isn't desireable.  Here are some examples interacting with the app service directly.
 
 * View the list of potential Superheros to vote for.
-  * `curl -H "key: SecureApp" http://myhero-app.$MANTL_DOMAIN/options`
+  * `curl -H "key: SecureApp" http://DEPLOYMENTNAME-app.$MANTL_DOMAIN/options`
 * View the current standings.
-  * `curl -H "key: SecureApp" http://myhero-app.$MANTL_DOMAIN/results`
+  * `curl -H "key: SecureApp" http://DEPLOYMENTNAME-app.$MANTL_DOMAIN/results`
 * Place a vote for a hero
-  * `curl -H "key: SecureApp" -X POST http://myhero-app.$MANTL_DOMAIN/vote/Batman`
+  * `curl -H "key: SecureApp" -X POST http://DEPLOYMENTNAME-app.$MANTL_DOMAIN/vote/Batman`
 
 # MyHero Service Code and Containers
 Other services are:
